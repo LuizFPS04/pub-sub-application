@@ -7,16 +7,16 @@ export class LeagueRepository {
         return league.save();
     }
 
-    async getLeagueById(id: string): Promise<League | null> {
-        return LeagueModel.findById(id);
+    async getLeagueById(leagueId: string): Promise<League | null> {
+        return LeagueModel.findOne({leagueId });
     }
 
-    async updateLeague(id: string, updateData: Partial<League>): Promise<League | null> {
-        return LeagueModel.findByIdAndUpdate(id, updateData, { new: true });
+    async updateLeague(leagueId: string, updateData: Partial<League>): Promise<League | null> {
+        return LeagueModel.findOneAndUpdate({ leagueId }, updateData, { new: true });
     }
 
-    async deleteLeague(id: string): Promise<League | null> {
-        return LeagueModel.findByIdAndDelete(id);
+    async deleteLeague(leagueId: string): Promise<League | null> {
+        return LeagueModel.findOneAndDelete({ leagueId });
     }
 
     async getAllLeagues(): Promise<League[]> {

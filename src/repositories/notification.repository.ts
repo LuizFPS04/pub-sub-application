@@ -1,29 +1,38 @@
-import { Odds } from '../types/oddsType';
-import OddsModel from '../models/oddsModel';
+import { Notification } from "../types/notificationType";
+import NotificationModel from "../models/notificationModel";
+import { Types } from "mongoose";
 
-export class OddsRepository {
-    async createOdds(oddsData: Omit<Odds, '_id'>): Promise<Odds> {
-        const odds = new OddsModel(oddsData);
-        return odds.save();
+export class NotificationRepository {
+    async createNotification(notificationData: Omit<Notification, "_id">): Promise<Notification> {
+        const notification = new NotificationModel(notificationData);
+        return notification.save();
     }
 
-    async getOddsById(id: string): Promise<Odds | null> {
-        return OddsModel.findById(id);
+    async getNotificationById(id: string | Types.ObjectId): Promise<Notification | null> {
+        return NotificationModel.findById(id);
     }
 
-    async updateOdds(id: string, updateData: Partial<Odds>): Promise<Odds | null> {
-        return OddsModel.findByIdAndUpdate(id, updateData, { new: true });
+    async updateNotification(id: string | Types.ObjectId, updateData: Partial<Notification>): Promise<Notification | null> {
+        return NotificationModel.findByIdAndUpdate(id, updateData, { new: true });
     }
 
-    async deleteOdds(id: string): Promise<Odds | null> {
-        return OddsModel.findByIdAndDelete(id);
+    async deleteNotification(id: string | Types.ObjectId): Promise<Notification | null> {
+        return NotificationModel.findByIdAndDelete(id);
     }
 
-    async getAllOdds(): Promise<Odds[]> {
-        return OddsModel.find();
+    async getAllNotifications(): Promise<Notification[]> {
+        return NotificationModel.find();
     }
 
-    async deleteAllOdds(): Promise<void> {
-        await OddsModel.deleteMany({});
+    async getNotificationsByUser(userId: string | Types.ObjectId): Promise<Notification[]> {
+        return NotificationModel.find({ userId });
+    }
+
+    async getNotificationsByMatch(matchId: string | Types.ObjectId): Promise<Notification[]> {
+        return NotificationModel.find({ matchId });
+    }
+
+    async deleteAllNotifications(): Promise<void> {
+        await NotificationModel.deleteMany({});
     }
 }

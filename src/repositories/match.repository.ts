@@ -11,6 +11,10 @@ export class MatchRepository {
         return MatchModel.findById(id);
     }
 
+    async getMatchByLeague(leagueId: string): Promise<Match[] | null> {
+        return MatchModel.findOne({ leagueId });
+    }
+
     async updateMatch(id: string, updateData: Partial<Match>): Promise<Match | null> {
         return MatchModel.findByIdAndUpdate(id, updateData, { new: true });
     }
@@ -25,5 +29,13 @@ export class MatchRepository {
 
     async deleteAllMatches(): Promise<void> {
         await MatchModel.deleteMany({});
+    }
+
+    async upsertMatch(matchData: any) {
+        return MatchModel.updateOne(
+            { id: matchData.id },
+            { $set: matchData },
+            { upsert: true }
+        );
     }
 }

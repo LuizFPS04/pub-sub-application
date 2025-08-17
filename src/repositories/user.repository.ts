@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { User } from "../types/userType";
 import UserModel from "../models/userModel";
+import { Types } from "mongoose";
 
 export class UserRepository {
     async createUser(userData: Omit<User, '_id'>): Promise<User> {
@@ -13,15 +14,15 @@ export class UserRepository {
         return UserModel.findOne({ email });
     }
 
-    async updateUser(id: string, updateData: Partial<User>): Promise<User | null> {
+    async updateUser(id: Types.ObjectId, updateData: Partial<User>): Promise<User | null> {
         return UserModel.findByIdAndUpdate(id, updateData, { new: true });
     }
 
-    async deleteUser(id: string): Promise<User | null> {
+    async deleteUser(id: Types.ObjectId): Promise<User | null> {
         return UserModel.findByIdAndDelete(id);
     }
 
-    async getUserById(id: string): Promise<User | null> {
+    async getUserById(id: Types.ObjectId): Promise<User | null> {
         return UserModel.findById(id);
     }
 
