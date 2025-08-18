@@ -24,7 +24,7 @@ export class MatchRepository {
     }
 
     async getAllMatches(): Promise<Match[]> {
-        return MatchModel.find();
+        return MatchModel.find().exec();
     }
 
     async deleteAllMatches(): Promise<void> {
