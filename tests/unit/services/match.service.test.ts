@@ -5,9 +5,9 @@ import { appEvents } from '../../../src/events/eventEmitter';
 import { mockMatch, mockMatchesApiResponse } from '../../mocks';
 
 // Mocks
-jest.mock('../../src/repositories/match.repository');
-jest.mock('../../src/integrations/footballApi');
-jest.mock('../../src/events/eventEmitter');
+jest.mock('../../../src/repositories/match.repository');
+jest.mock('../../../src/integrations/footballApi');
+jest.mock('../../../src/events/eventEmitter');
 
 const MockedMatchRepository = MatchRepository as jest.MockedClass<typeof MatchRepository>;
 const mockedFootballApi = footballApi as jest.Mocked<typeof footballApi>;

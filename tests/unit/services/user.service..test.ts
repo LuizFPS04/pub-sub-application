@@ -4,7 +4,7 @@ import { mockUser } from '../../mocks';
 import { Types } from 'mongoose';
 
 // Mock do repositório
-jest.mock('../../src/repositories/user.repository');
+jest.mock('../../../src/repositories/user.repository');
 const MockedUserRepository = UserRepository as jest.MockedClass<typeof UserRepository>;
 
 describe('User Service', () => {
@@ -83,7 +83,7 @@ describe('User Service', () => {
 
             expect(result).toEqual(mockUser);
             expect(userRepo.findUserByEmail).toHaveBeenCalledWith(email);
-            expect(userRepo.deleteUser).toHaveBeenCalledWith(mockUser._id);
+            expect(userRepo.deleteUser).toHaveBeenCalledWith(mockUser.email);
         });
 
         it('should throw error when user not found', async () => {
@@ -109,7 +109,7 @@ describe('User Service', () => {
 
             expect(result).toEqual(updatedUser);
             expect(userRepo.findUserByEmail).toHaveBeenCalledWith(email);
-            expect(userRepo.updateUser).toHaveBeenCalledWith(mockUser._id, updateData);
+            expect(userRepo.updateUser).toHaveBeenCalledWith(mockUser.email, updateData);
         });
 
         it('should throw error when user not found for update', async () => {

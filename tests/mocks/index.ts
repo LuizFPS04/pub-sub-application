@@ -2,7 +2,6 @@ import { Types } from 'mongoose';
 
 // Mock de usuário
 export const mockUser = {
-    _id: new Types.ObjectId(),
     name: 'João Silva',
     email: 'joao@email.com',
     password: 'senha123',

@@ -1,18 +1,13 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-let mongoServer: MongoMemoryServer;
+const dbUri = process.env.DB_URI || "mongodb://localhost:27017/football";
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-
-    await mongoose.connect(mongoUri);
+  await mongoose.connect(dbUri);
 });
 
 afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+  await mongoose.disconnect();
 });
 
 beforeEach(async () => {
