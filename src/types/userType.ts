@@ -5,7 +5,7 @@ export interface User extends Document {
     name: string;
     email: string;
     password: string;
-    firstTeam: string;
+    followedTeams: any[];
     isActive?: boolean;
     otherTeams?: string[];
 }

@@ -4,14 +4,13 @@ import { Request, Response } from 'express';
 export async function insertUser(req: Request, res: Response): Promise<any> {
     try {
 
-        const { name, email, password, firstTeam, otherTeams } = req.body;
+        const { name, email, password, followedTeams } = req.body;
 
         const userToEnteredBody: any = { 
             name, 
             email, 
             password, 
-            firstTeam, 
-            otherTeams 
+            followedTeams
         };
 
         const userToEntered = await userService.createUser(userToEnteredBody);

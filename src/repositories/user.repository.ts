@@ -10,6 +10,10 @@ export class UserRepository {
         return user.save();
     }
 
+    async findUserFollowedTeams(teamIds: any): Promise<User[] | null> {
+        return UserModel.find({ followedTeams: { $in: teamIds } })
+    }
+
     async findUserByEmail(email: string): Promise<User | null> {
         return UserModel.findOne({ email });
     }

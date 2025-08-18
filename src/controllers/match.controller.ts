@@ -111,7 +111,7 @@ export async function getAllMatches(req: Request, res: Response): Promise<any> {
 export async function getMatchById(req: Request, res: Response): Promise<any> {
     try {
 
-        const id: any = req.query._id;
+        const id: any = req.query.id;
         const match = matchService.getMatchById(id);
 
         if (!match) {

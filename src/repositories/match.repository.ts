@@ -8,7 +8,7 @@ export class MatchRepository {
     }
 
     async getMatchById(id: string): Promise<Match | null> {
-        return MatchModel.findById(id);
+        return MatchModel.findOne({ id: id });
     }
 
     async getMatchByLeague(leagueId: string): Promise<Match[] | null> {
@@ -16,7 +16,7 @@ export class MatchRepository {
     }
 
     async updateMatch(id: string, updateData: Partial<Match>): Promise<Match | null> {
-        return MatchModel.findByIdAndUpdate(id, updateData, { new: true });
+        return MatchModel.findOneAndUpdate({ id: id }, updateData, { new: true });
     }
 
     async deleteMatch(id: string): Promise<Match | null> {
@@ -32,9 +32,16 @@ export class MatchRepository {
     }
 
     async upsertMatch(matchData: any) {
+        console.log(JSON.stringify(matchData.score.fullTime))
         return MatchModel.updateOne(
             { id: matchData.id },
-            { $set: matchData },
+            { 
+                $set: {
+                    ...matchData,
+                    matchName: `${matchData.competition.name} 2025 - Rodada ${matchData.season.currentMatchday} - ${matchData.homeTeam.shortName} × ${matchData.awayTeam.shortName}`,
+                    score: matchData.score.fullTime
+                } 
+            },
             { upsert: true }
         );
     }

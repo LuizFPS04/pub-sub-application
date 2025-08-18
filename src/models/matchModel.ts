@@ -2,8 +2,22 @@ import { Schema, model } from 'mongoose';
 import { Match } from '../types/matchType';
 
 const matchSchema = new Schema<Match>({
-    homeTeam: { type: String, required: true },
-    awayTeam: { type: String, required: true },
+    id: { type: String, required: true },
+    matchName: { type: String, required: true },
+    homeTeam: {
+        id: Number,
+        name: String,
+        shortName: String,
+        tla: String,
+        crest: String
+    },
+    awayTeam: {
+        id: Number,
+        name: String,
+        shortName: String,
+        tla: String,
+        crest: String
+    },
     date: { type: Date, required: true },
     score: {
         home: { type: Number, default: 0 },
@@ -11,15 +25,14 @@ const matchSchema = new Schema<Match>({
     },
     status: {
         type: String,
-        enum: ['scheduled', 'in_progress', 'finished'],
-        default: 'scheduled'
+        enum: ['TIMED', 'IN_PLAY', 'FINISHED'],
+        default: 'TIMED'
     },
     leagueId: { type: Schema.Types.ObjectId, ref: 'League', required: true },
     events: [{
         type: {
             type: String,
-            enum: ['goal', 'card', 'substitution'],
-            required: true
+            enum: ['goal', 'card', 'substitution']
         },
         team: { type: String },
         player: { type: String },

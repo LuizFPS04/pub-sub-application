@@ -1,12 +1,11 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import { User } from '../types/userType';
 
 const userSchema = new Schema<User>({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    firstTeam: { type: String, required: true },
-    otherTeams: { type: [String], default: [] },
+    followedTeams: [{ type: Schema.Types.ObjectId, ref: "Team" }],
     isActive: { type: Boolean, default: true }
 }, {
     timestamps: true

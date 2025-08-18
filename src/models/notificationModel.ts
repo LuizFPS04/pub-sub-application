@@ -5,7 +5,7 @@ const notificationSchema = new Schema<Notification>({
     userId: { type: Schema.Types.ObjectId, required: true },
     type: { type: String, required: true },
     message: { type: String, required: true },
-    team: { type: String },
+    teams: [{ type: String }],
     matchId: { type: Schema.Types.ObjectId }
 }, {
     timestamps: true

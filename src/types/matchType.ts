@@ -1,15 +1,17 @@
 import { Document, Types } from 'mongoose';
+import { Team } from './teamType';
 
 export interface Match extends Document {
     _id: Types.ObjectId;
-    homeTeam: string;
-    awayTeam: string;
+    matchName: String,
+    homeTeam: Team;
+    awayTeam: Team;
     date: Date;
     score?: {
         home: number;
         away: number;
     };
-    status: 'scheduled' | 'in_progress' | 'finished';
+    status: 'TIMED' | 'IN_PLAY' | 'FINISHED';
     leagueId: Types.ObjectId;
     events: MatchEvent[];
     referee?: string;
@@ -21,5 +23,5 @@ type MatchEvent = {
     team?: string;
     player?: string;
     minute?: number;
-    details?: string; // Additional details about the event
+    details?: string;
 };

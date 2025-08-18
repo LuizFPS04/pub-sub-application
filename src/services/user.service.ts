@@ -12,6 +12,10 @@ export async function getUserById(id: Types.ObjectId): Promise<User | null> {
     return await userClient.getUserById(id);
 }
 
+export async function findUserFollowedTeams(teams: any): Promise<User[] | null> {
+    return await userClient.findUserFollowedTeams(teams);
+}
+
 export async function findUserByEmail(mail: string): Promise<User | null> {
     return await userClient.findUserByEmail(mail);
 }

@@ -1,8 +1,20 @@
 import cron from "node-cron";
-import * as matchService from '../services/match.service';
+import * as matchService from "../services/match.service";
 
-// Rodar a cada hora
-cron.schedule("0 * * * *", async () => {
-  console.log("🔄 Sincronizando jogos do Brasileirão...");
-  await matchService.syncMatches(); // ID do Brasileirão no Football Data
-});
+export async function matchTask() {
+  cron.schedule(
+    "* * * * *",
+    async () => {
+      try {
+        console.log("🔄 Sincronizando jogos do Brasileirão...");
+        await matchService.syncMatches();
+        console.log("✅ Sincronização concluída!");
+      } catch (err) {
+        console.error("❌ Erro na sincronização:", err);
+      }
+    },
+    {
+      timezone: "America/Sao_Paulo",
+    }
+  );
+}

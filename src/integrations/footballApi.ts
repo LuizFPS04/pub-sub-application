@@ -3,21 +3,15 @@ import axios from "axios";
 const footballApi = axios.create({
   baseURL: "https://api.football-data.org/v4",
   headers: {
-    "X-Auth-Token": process.env.FOOTBALL_API_KEY || "",
+    "X-Auth-Token": process.env.FOOTBALL_API_KEY || "d2d4a170fe86468d997572f65aa3d557",
   },
 });
 
-/**
- * 🏆 Competição (Brasileirão)
- */
 export async function getCompetition() {
   const res = await footballApi.get(`/competitions/BSA`);
   return res.data;
 }
 
-/**
- * 📅 Partidas do Brasileirão (pode filtrar por temporada)
- */
 export async function getMatches(params?: {
   dateFrom?: string;   // YYYY-MM-DD
   dateTo?: string;     // YYYY-MM-DD
@@ -28,56 +22,34 @@ export async function getMatches(params?: {
   season?: number;
 }) {
   const res = await footballApi.get(`/competitions/BSA/matches`, { params });
-  return res.data;
+  return res.data.matches;
 }
 
-/**
- * 📖 Detalhes de uma partida específica
- */
 export async function getMatch(matchId: number) {
   const res = await footballApi.get(`/matches/${matchId}`);
   return res.data;
 }
 
-/**
- * 👥 Times participantes
- */
 export async function getTeams() {
-  const res = await footballApi.get(`/competitions/BSA/teams`);
+  const res = await footballApi.get(`/competitions/BSA/teams?season=2025`);
   return res.data;
 }
 
-/**
- * 📊 Classificação (tabela bruta)
- */
 export async function getStanding(season: number = 2025) {
   const res = await footballApi.get(`/competitions/BSA/standings?season=${season}`);
   return res.data;
 }
 
-/**
- * 📖 Detalhes de um time
- */
 export async function getTeam(teamId: number) {
   const res = await footballApi.get(`/teams/${teamId}`);
   return res.data;
 }
 
-/**
- * 📖 Detalhes de um jogador
- */
 export async function getPlayer(playerId: number) {
   const res = await footballApi.get(`/persons/${playerId}`);
   return res.data;
 }
 
-/* -------------------------
- * 🔧 NORMALIZAÇÕES ÚTEIS
- * ------------------------- */
-
-/**
- * Normaliza standings → retorna array simplificado
- */
 export async function getNormalizedStandings(season: number = 2025) {
   const data = await getStanding(season);
 
@@ -97,9 +69,6 @@ export async function getNormalizedStandings(season: number = 2025) {
   }));
 }
 
-/**
- * Normaliza partidas → retorna info mais limpa
- */
 export async function getNormalizedMatches(params?: {
   dateFrom?: string;
   dateTo?: string;
@@ -133,9 +102,7 @@ export async function getNormalizedMatches(params?: {
   }));
 }
 
-/**
- * Normaliza times → retorna apenas id, nome e escudo
- */
+
 export async function getNormalizedTeams() {
   const data = await getTeams();
 

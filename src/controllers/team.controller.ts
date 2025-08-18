@@ -1,12 +1,12 @@
-import * as leagueService from '../services/league.service';
+import * as teamService from '../services/team.service';
 import { Request, Response } from 'express';
 
-export async function getAllLeagues(req: Request, res: Response): Promise<any> {
+export async function getAllTeams(req: Request, res: Response): Promise<any> {
     try {
-        const leagues = await leagueService.getAllLeagues();
+        const teams = await teamService.getAllTeams();
         return res.status(200).send({
             success: true,
-            data: leagues,
+            data: teams,
         });
     } catch (error: any) {
         console.error(error);
@@ -17,21 +17,21 @@ export async function getAllLeagues(req: Request, res: Response): Promise<any> {
     }
 }
 
-export async function getLeagueById(req: Request, res: Response): Promise<any> {
+export async function getTeamById(req: Request, res: Response): Promise<any> {
     try {
         const { id } = req.params;
-        const league = await leagueService.getLeagueById(id);
+        const team = await teamService.getTeamById(id);
 
-        if (!league) {
+        if (!team) {
             return res.status(404).send({
                 success: false,
-                message: 'League not found',
+                message: 'Team not found',
             });
         }
 
         return res.status(200).send({
             success: true,
-            data: league,
+            data: team,
         });
     } catch (error: any) {
         console.error(error);
@@ -42,14 +42,15 @@ export async function getLeagueById(req: Request, res: Response): Promise<any> {
     }
 }
 
-export async function insertLeague(req: Request, res: Response): Promise<any> {
+export async function insertTeam(req: Request, res: Response): Promise<any> {
     try {
-        const league = await leagueService.syncLeague();
+        const teamData = req.body;
+        const team = await teamService.insertTeam(teamData);
 
         return res.status(201).send({
             success: true,
-            message: 'League created or updated successfully',
-            data: league,
+            message: 'Team created successfully',
+            data: team,
         });
     } catch (error: any) {
         console.error(error);
@@ -60,24 +61,24 @@ export async function insertLeague(req: Request, res: Response): Promise<any> {
     }
 }
 
-export async function updateLeague(req: Request, res: Response): Promise<any> {
+export async function updateTeam(req: Request, res: Response): Promise<any> {
     try {
         const { id } = req.params;
-        const leagueData = req.body;
+        const teamData = req.body;
 
-        const updatedLeague = await leagueService.updateLeague(id, leagueData);
+        const updatedTeam = await teamService.updateTeam(id, teamData);
 
-        if (!updatedLeague) {
+        if (!updatedTeam) {
             return res.status(404).send({
                 success: false,
-                message: 'League not found',
+                message: 'Team not found',
             });
         }
 
         return res.status(200).send({
             success: true,
-            message: 'League updated successfully',
-            data: updatedLeague,
+            message: 'Team updated successfully',
+            data: updatedTeam,
         });
     } catch (error: any) {
         console.error(error);
@@ -88,22 +89,22 @@ export async function updateLeague(req: Request, res: Response): Promise<any> {
     }
 }
 
-export async function deleteLeague(req: Request, res: Response): Promise<any> {
+export async function deleteTeam(req: Request, res: Response): Promise<any> {
     try {
         const { id } = req.params;
-        const deletedLeague = await leagueService.deleteLeague(id);
+        const deletedTeam = await teamService.deleteTeam(id);
 
-        if (!deletedLeague) {
+        if (!deletedTeam) {
             return res.status(404).send({
                 success: false,
-                message: 'League not found',
+                message: 'Team not found',
             });
         }
 
         return res.status(200).send({
             success: true,
-            message: 'League deleted successfully',
-            data: deletedLeague,
+            message: 'Team deleted successfully',
+            data: deletedTeam,
         });
     } catch (error: any) {
         console.error(error);
@@ -114,13 +115,31 @@ export async function deleteLeague(req: Request, res: Response): Promise<any> {
     }
 }
 
-export async function deleteAllLeagues(req: Request, res: Response): Promise<any> {
+export async function deleteAllTeams(req: Request, res: Response): Promise<any> {
     try {
-        await leagueService.deleteAllLeagues();
+        await teamService.deleteAllTeams();
 
         return res.status(200).send({
             success: true,
-            message: 'All leagues deleted successfully',
+            message: 'All teams deleted successfully',
+        });
+    } catch (error: any) {
+        console.error(error);
+        return res.status(error.status || 500).send({
+            success: false,
+            message: error.message || 'Internal server error',
+        });
+    }
+}
+
+export async function syncTeams(req: Request, res: Response): Promise<any> {
+    try {
+        const teams = await teamService.syncTeams();
+
+        return res.status(200).send({
+            success: true,
+            message: 'Teams synchronized successfully',
+            data: teams,
         });
     } catch (error: any) {
         console.error(error);
