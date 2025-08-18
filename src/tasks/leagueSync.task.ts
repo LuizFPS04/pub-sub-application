@@ -3,7 +3,7 @@ import * as leagueService from "../services/league.service";
 
 export async function leagueTask() {
     cron.schedule(
-        "* * * * *",
+        "0 5 1 * *",
         async () => {
             try {
                 console.log("🔄 Sincronizando liga...");

@@ -3,7 +3,7 @@ import * as teamService from "../services/team.service";
 
 export async function teamTask() {
     cron.schedule(
-        "* * * * *",
+        "0 7 * * *",
         async () => {
             try {
                 console.log("🔄 Sincronizando tabela...");
