@@ -3,7 +3,7 @@ import * as teamController from '../controllers/team.controller';
 const router = Router();
 
 router.post('/team', teamController.insertTeam);
-router.get('/team/all', teamController.getAllTeams);
+router.get('/teams', teamController.getAllTeams);
 router.get('/team/:id', teamController.getTeamById);
 router.put('/team/:id', teamController.updateTeam);
 router.delete('/team/all', teamController.deleteAllTeams);
