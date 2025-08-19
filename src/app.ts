@@ -3,6 +3,9 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
+import { swaggerDocs } from './utils/swagger';
+import swaggerUi from 'swagger-ui-express';
+
 import connectToDatabase from './config/database';
 import routes from './routes/index';
 import { runTasks } from './tasks';
@@ -15,11 +18,13 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 app.use("/api", routes);
 
 async function startApp() {
-    await connectToDatabase(); // garante conexão antes das tasks
-    await runTasks();          // só roda tasks após conexão
+    await connectToDatabase();
+    await runTasks();
 }
 
 startApp();

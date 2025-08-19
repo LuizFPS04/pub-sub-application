@@ -16,7 +16,7 @@ export class MatchRepository {
     }
 
     async updateMatch(id: string, updateData: Partial<Match>): Promise<Match | null> {
-        return MatchModel.findOneAndUpdate({ id: id }, updateData, { new: true });
+        return MatchModel.findOneAndUpdate({ id: id }, updateData, { new: true, upsert: true });
     }
 
     async deleteMatch(id: string): Promise<Match | null> {
@@ -24,7 +24,7 @@ export class MatchRepository {
     }
 
     async getAllMatches(): Promise<Match[]> {
-        return MatchModel.find().exec();
+        return MatchModel.find();
     }
 
     async deleteAllMatches(): Promise<void> {

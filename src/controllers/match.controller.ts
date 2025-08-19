@@ -165,6 +165,6 @@ export async function getMatchByLeague(req: Request, res: Response): Promise<any
 }
 
 export async function syncNow(req: Request, res: Response) {
-    const matches = await await matchService.syncMatches();
+    const matches = await matchService.syncMatches();
     res.json({ success: true, total: matches.length });
 }

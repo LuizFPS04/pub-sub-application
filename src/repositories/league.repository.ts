@@ -23,7 +23,7 @@ export class LeagueRepository {
     }
 
     async getAllLeagues(): Promise<League[]> {
-        return LeagueModel.find().populate('teams');
+        return LeagueModel.find().populate('teams');;
     }
 
     async deleteAllLeagues(): Promise<void> {

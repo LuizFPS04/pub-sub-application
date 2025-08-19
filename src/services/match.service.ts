@@ -21,13 +21,13 @@ export async function getMatchByLeague(leagueId: string): Promise<Match[] | null
     return await matchClient.getMatchByLeague(leagueId);
 }
 
-export async function updateMatch(id: string, updatedMatch: Match): Promise<Match | null> {
+export async function updateMatch(id: string, updatedMatch: Partial<Match>): Promise<Match | null> {
     const existingMatch = await matchClient.getMatchById(id);
     if (!existingMatch) return null;
 
     const changedFields: string[] = [];
 
-    if (updatedMatch.status !== existingMatch.status) {
+    if (updatedMatch.status !== undefined && updatedMatch.status !== existingMatch.status) {
         changedFields.push("status");
     }
 
@@ -60,20 +60,28 @@ export async function deleteAllMatches(): Promise<void> {
 
 export async function syncMatches() {
     const today = new Date();
+    today.setHours(today.getHours() - 3);
+    const nextWeek = new Date();
+    nextWeek.setHours(nextWeek.getHours() - 3);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+
     const matches = await getMatches(
         {
             dateFrom: today.toISOString().split("T")[0],
-            dateTo: today.toISOString().split("T")[0],
+            dateTo: nextWeek.toISOString().split("T")[0],
             season: 2025,
         }
     );
 
     for (const match of matches) {
 
-        const existingMatch = await matchClient.getMatchById(match.id)
+        const existingMatch = await matchClient.getMatchById(match.id);
 
         if (existingMatch) {
-            await updateMatch(existingMatch.id, match.score.fullTime);
+            await updateMatch(existingMatch.id, {
+                score: match.score.fullTime,
+                status: match.status,
+            });
         } else {
             const res = await matchClient.upsertMatch(match);
             if (res.upsertedCount > 0) {
