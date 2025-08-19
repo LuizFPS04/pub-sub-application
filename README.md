@@ -4,6 +4,8 @@
 
 Esta API fornece informações sobre o Campeonato Brasileiro de Futebol, permitindo gerenciar ligas, times, partidas, usuários e notificações. A API integra com a Football Data API para sincronização automática de dados.
 
+### Branch Dev contém os testes
+
 ## Tecnologias Utilizadas
 
 - **Node.js** com TypeScript
@@ -17,7 +19,7 @@ Esta API fornece informações sobre o Campeonato Brasileiro de Futebol, permiti
 ## Base URL
 
 ```
-http://localhost:3000/api/v1
+http://localhost:5000/api/v1
 ```
 
 ## Arquitetura
