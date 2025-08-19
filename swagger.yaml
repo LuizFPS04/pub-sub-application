@@ -1,0 +1,960 @@
+openapi: 3.0.0
+info:
+  title: Football API
+  description: API para gerenciamento de dados do Campeonato Brasileiro de Futebol
+  version: 1.0.0
+  contact:
+    name: Football API Support
+    email: support@footballapi.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Servidor de desenvolvimento
+  - url: https://api.football.com/v1
+    description: Servidor de produção
+
+paths:
+  # USUÁRIOS
+  /user:
+    post:
+      tags:
+        - Usuários
+      summary: Criar novo usuário
+      description: Cria um novo usuário no sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+            example:
+              name: "João Silva"
+              email: "joao@email.com"
+              password: "senha123"
+              followedTeams: ["507f1f77bcf86cd799439011"]
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: "User created successfully"
+                data:
+                  _id: "507f1f77bcf86cd799439011"
+                  name: "João Silva"
+                  email: "joao@email.com"
+                  followedTeams: ["507f1f77bcf86cd799439011"]
+                  isActive: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags:
+        - Usuários
+      summary: Buscar usuário por email
+      description: Busca um usuário através do email
+      parameters:
+        - name: mail
+          in: query
+          required: true
+          schema:
+            type: string
+            format: email
+          description: Email do usuário
+          example: joao@email.com
+      responses:
+        '200':
+          description: Usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /users:
+    get:
+      tags:
+        - Usuários
+      summary: Listar todos os usuários
+      description: Retorna uma lista de todos os usuários cadastrados
+      responses:
+        '200':
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: "Users fetched successfully"
+                data: []
+
+  /user/{id}:
+    get:
+      tags:
+        - Usuários
+      summary: Buscar usuário por ID
+      description: Retorna os dados de um usuário específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID do usuário
+          example: "507f1f77bcf86cd799439011"
+      responses:
+        '200':
+          description: Usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # TIMES
+  /team:
+    post:
+      tags:
+        - Times
+      summary: Criar novo time
+      description: Cadastra um novo time no sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeamRequest'
+            example:
+              id: 123
+              name: "Clube de Regatas do Flamengo"
+              shortName: "Flamengo"
+              tla: "FLA"
+              website: "https://flamengo.com.br"
+              clubColors: "Vermelho / Preto"
+              stadium: "Maracanã"
+      responses:
+        '201':
+          description: Time criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /teams:
+    get:
+      tags:
+        - Times
+      summary: Listar todos os times
+      description: Retorna uma lista de todos os times cadastrados
+      responses:
+        '200':
+          description: Lista de times
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                data:
+                  - _id: "507f1f77bcf86cd799439011"
+                    id: 123
+                    name: "Flamengo"
+                    shortName: "FLA"
+                    tla: "FLA"
+                    position: 1
+                    points: 45
+
+  /team/{id}:
+    get:
+      tags:
+        - Times
+      summary: Buscar time por ID
+      description: Retorna os dados de um time específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID do time
+      responses:
+        '200':
+          description: Time encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    put:
+      tags:
+        - Times
+      summary: Atualizar time
+      description: Atualiza os dados de um time
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID do time
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTeamRequest'
+      responses:
+        '200':
+          description: Time atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /team/all:
+    delete:
+      tags:
+        - Times
+      summary: Deletar todos os times
+      description: Remove todos os times do sistema
+      responses:
+        '200':
+          description: Times deletados com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: "All teams deleted successfully"
+
+  # LIGAS
+  /league:
+    post:
+      tags:
+        - Ligas
+      summary: Sincronizar liga
+      description: Sincroniza os dados da liga com a API externa
+      responses:
+        '201':
+          description: Liga sincronizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /leagues:
+    get:
+      tags:
+        - Ligas
+      summary: Listar todas as ligas
+      description: Retorna uma lista de todas as ligas cadastradas
+      responses:
+        '200':
+          description: Lista de ligas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /league/{id}:
+    get:
+      tags:
+        - Ligas
+      summary: Buscar liga por ID
+      description: Retorna os dados de uma liga específica
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID da liga
+      responses:
+        '200':
+          description: Liga encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    put:
+      tags:
+        - Ligas
+      summary: Atualizar liga
+      description: Atualiza os dados de uma liga
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID da liga
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLeagueRequest'
+      responses:
+        '200':
+          description: Liga atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /league/all:
+    delete:
+      tags:
+        - Ligas
+      summary: Deletar todas as ligas
+      description: Remove todas as ligas do sistema
+      responses:
+        '200':
+          description: Ligas deletadas com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  # PARTIDAS
+  /match:
+    post:
+      tags:
+        - Partidas
+      summary: Criar nova partida
+      description: Cadastra uma nova partida no sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMatchRequest'
+            example:
+              homeTeam:
+                id: 123
+                name: "Flamengo"
+                shortName: "FLA"
+                tla: "FLA"
+                crest: "https://example.com/flamengo.png"
+              awayTeam:
+                id: 456
+                name: "Vasco da Gama"
+                shortName: "Vasco"
+                tla: "VAS"
+                crest: "https://example.com/vasco.png"
+              date: "2025-08-20T19:30:00Z"
+              score:
+                home: 2
+                away: 1
+              status: "FINISHED"
+              leagueId: "507f1f77bcf86cd799439011"
+              referee: "Árbitro Silva"
+              stadium: "Maracanã"
+      responses:
+        '201':
+          description: Partida criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    
+    get:
+      tags:
+        - Partidas
+      summary: Buscar partidas por liga
+      description: Retorna partidas de uma liga específica
+      parameters:
+        - name: leagueId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ID da liga
+          example: "507f1f77bcf86cd799439011"
+      responses:
+        '200':
+          description: Partidas encontradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /matches:
+    get:
+      tags:
+        - Partidas
+      summary: Listar todas as partidas
+      description: Retorna uma lista de todas as partidas cadastradas
+      responses:
+        '200':
+          description: Lista de partidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: "Matches fetched successfully"
+                data: []
+
+  /match/{id}:
+    get:
+      tags:
+        - Partidas
+      summary: Buscar partida por ID
+      description: Retorna os dados de uma partida específica
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID da partida
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ID da partida (query param)
+      responses:
+        '200':
+          description: Partida encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    put:
+      tags:
+        - Partidas
+      summary: Atualizar partida
+      description: Atualiza os dados de uma partida
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID da partida
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMatchRequest'
+      responses:
+        '200':
+          description: Partida atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    # Requests
+    CreateUserRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          description: Nome completo do usuário
+          example: "João Silva"
+        email:
+          type: string
+          format: email
+          description: Email único do usuário
+          example: "joao@email.com"
+        password:
+          type: string
+          minLength: 6
+          description: Senha do usuário
+          example: "senha123"
+        followedTeams:
+          type: array
+          items:
+            type: string
+          description: Array com IDs dos times seguidos pelo usuário
+          example: ["507f1f77bcf86cd799439011"]
+
+    CreateTeamRequest:
+      type: object
+      required:
+        - id
+        - name
+        - shortName
+        - tla
+      properties:
+        id:
+          type: integer
+          description: ID único do time (da API externa)
+          example: 123
+        name:
+          type: string
+          description: Nome completo do time
+          example: "Clube de Regatas do Flamengo"
+        shortName:
+          type: string
+          description: Nome curto do time
+          example: "Flamengo"
+        tla:
+          type: string
+          description: Código de três letras do time
+          example: "FLA"
+        website:
+          type: string
+          format: uri
+          description: Website oficial do time
+          example: "https://flamengo.com.br"
+        clubColors:
+          type: string
+          description: Cores do clube
+          example: "Vermelho / Preto"
+        stadium:
+          type: string
+          description: Nome do estádio
+          example: "Maracanã"
+
+    UpdateTeamRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Flamengo"
+        shortName:
+          type: string
+          example: "FLA"
+        website:
+          type: string
+          format: uri
+        clubColors:
+          type: string
+        stadium:
+          type: string
+        position:
+          type: integer
+          minimum: 1
+        points:
+          type: integer
+          minimum: 0
+        playedGames:
+          type: integer
+          minimum: 0
+        won:
+          type: integer
+          minimum: 0
+        draw:
+          type: integer
+          minimum: 0
+        lost:
+          type: integer
+          minimum: 0
+        goalsFor:
+          type: integer
+          minimum: 0
+        goalsAgainst:
+          type: integer
+          minimum: 0
+        goalDifference:
+          type: integer
+
+    UpdateLeagueRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Campeonato Brasileiro Série A"
+        country:
+          type: string
+          example: "Brazil"
+        season:
+          type: string
+          example: "2025"
+
+    CreateMatchRequest:
+      type: object
+      required:
+        - homeTeam
+        - awayTeam
+        - date
+        - leagueId
+      properties:
+        homeTeam:
+          $ref: '#/components/schemas/TeamInfo'
+        awayTeam:
+          $ref: '#/components/schemas/TeamInfo'
+        date:
+          type: string
+          format: date-time
+          description: Data e hora da partida
+          example: "2025-08-20T19:30:00Z"
+        score:
+          $ref: '#/components/schemas/Score'
+        status:
+          type: string
+          enum: [TIMED, IN_PLAY, FINISHED]
+          description: Status da partida
+          example: "FINISHED"
+        leagueId:
+          type: string
+          description: ID da liga
+          example: "507f1f77bcf86cd799439011"
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchEvent'
+        referee:
+          type: string
+          description: Nome do árbitro
+          example: "Árbitro Silva"
+        stadium:
+          type: string
+          description: Nome do estádio
+          example: "Maracanã"
+
+    UpdateMatchRequest:
+      type: object
+      properties:
+        score:
+          $ref: '#/components/schemas/Score'
+        status:
+          type: string
+          enum: [TIMED, IN_PLAY, FINISHED]
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchEvent'
+        referee:
+          type: string
+        stadium:
+          type: string
+
+    # Nested Objects
+    TeamInfo:
+      type: object
+      required:
+        - id
+        - name
+        - shortName
+        - tla
+      properties:
+        id:
+          type: integer
+          example: 123
+        name:
+          type: string
+          example: "Flamengo"
+        shortName:
+          type: string
+          example: "FLA"
+        tla:
+          type: string
+          example: "FLA"
+        crest:
+          type: string
+          format: uri
+          example: "https://example.com/flamengo.png"
+
+    Score:
+      type: object
+      properties:
+        home:
+          type: integer
+          minimum: 0
+          example: 2
+        away:
+          type: integer
+          minimum: 0
+          example: 1
+
+    MatchEvent:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [goal, card, substitution]
+          example: "goal"
+        team:
+          type: string
+          example: "FLA"
+        player:
+          type: string
+          example: "Gabigol"
+        minute:
+          type: integer
+          minimum: 1
+          maximum: 120
+          example: 45
+        details:
+          type: string
+          example: "Penalty goal"
+
+    # Response Models
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Operation completed successfully"
+        data:
+          type: object
+          description: Dados retornados (opcional)
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Error message"
+
+    # Entity Models
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "João Silva"
+        email:
+          type: string
+          format: email
+          example: "joao@email.com"
+        followedTeams:
+          type: array
+          items:
+            type: string
+          example: ["507f1f77bcf86cd799439011"]
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Team:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        id:
+          type: integer
+          example: 123
+        name:
+          type: string
+          example: "Flamengo"
+        shortName:
+          type: string
+          example: "FLA"
+        tla:
+          type: string
+          example: "FLA"
+        crest:
+          type: string
+          format: uri
+        website:
+          type: string
+          format: uri
+        clubColors:
+          type: string
+          example: "Vermelho / Preto"
+        stadium:
+          type: string
+          example: "Maracanã"
+        position:
+          type: integer
+          example: 1
+        playedGames:
+          type: integer
+          example: 20
+        form:
+          type: string
+          example: "WWDLW"
+        won:
+          type: integer
+          example: 15
+        draw:
+          type: integer
+          example: 3
+        lost:
+          type: integer
+          example: 2
+        points:
+          type: integer
+          example: 48
+        goalsFor:
+          type: integer
+          example: 45
+        goalsAgainst:
+          type: integer
+          example: 18
+        goalDifference:
+          type: integer
+          example: 27
+        leagueId:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+
+    League:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "Campeonato Brasileiro Série A"
+        country:
+          type: string
+          example: "Brazil"
+        season:
+          type: string
+          example: "2025"
+        teams:
+          type: array
+          items:
+            type: string
+          example: ["507f1f77bcf86cd799439011"]
+        leagueId:
+          type: integer
+          example: 2013
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Match:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        id:
+          type: string
+          example: "match123"
+        matchName:
+          type: string
+          example: "Brasileirão 2025 - Rodada 1 - FLA × VAS"
+        homeTeam:
+          $ref: '#/components/schemas/TeamInfo'
+        awayTeam:
+          $ref: '#/components/schemas/TeamInfo'
+        date:
+          type: string
+          format: date-time
+          example: "2025-08-20T19:30:00Z"
+        score:
+          $ref: '#/components/schemas/Score'
+        status:
+          type: string
+          enum: [TIMED, IN_PLAY, FINISHED]
+          example: "FINISHED"
+        leagueId:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchEvent'
+        referee:
+          type: string
+          example: "Árbitro Silva"
+        stadium:
+          type: string
+          example: "Maracanã"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Requisição inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "Invalid request parameters"
+
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "Resource not found"
+
+    InternalServerError:
+      description: Erro interno do servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "Internal server error"
+
+tags:
+  - name: Usuários
+    description: Operações relacionadas aos usuários do sistema
+  - name: Times
+    description: Gerenciamento de times de futebol
+  - name: Ligas
+    description: Gerenciamento de ligas e competições
+  - name: Partidas
+    description: Operações com partidas de futebol
