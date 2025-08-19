@@ -28,8 +28,12 @@ async function getUsersFollowingTeams(teamIds: string[]) {
 }
 
 appEvents.on("newMatch", async (match) => {
-    const message = `📢 Novo jogo: ${match.homeTeam.shortName} × ${match.awayTeam.shortName}`;
+    let message = `📢 Novo jogo: ${match.homeTeam.shortName} × ${match.awayTeam.shortName}`;
     console.log(message);
+
+    if (match.status !== 'TIMED') {
+        message += ` | Placar: ${match.score.home} × ${match.score.away} (${match.status})`
+    }
 
     const homeTeam: any = await teamService.getTeamById(match.homeTeam.id);
     const awaitTeam: any = await teamService.getTeamById(match.awayTeam.id);

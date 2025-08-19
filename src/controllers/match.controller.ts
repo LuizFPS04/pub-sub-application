@@ -84,7 +84,7 @@ export async function updateMatch(req: Request, res: Response): Promise<any> {
 export async function getAllMatches(req: Request, res: Response): Promise<any> {
     try {
 
-        const matches = matchService.getAllMatches();
+        const matches = await matchService.getAllMatches();
 
         if (!matches) {
             return res.status(404).send({
@@ -112,7 +112,7 @@ export async function getMatchById(req: Request, res: Response): Promise<any> {
     try {
 
         const id: any = req.query.id;
-        const match = matchService.getMatchById(id);
+        const match = await matchService.getMatchById(id);
 
         if (!match) {
             return res.status(404).send({
@@ -140,7 +140,7 @@ export async function getMatchByLeague(req: Request, res: Response): Promise<any
     try {
 
         const leagueId: any = req.query.leagueId;
-        const matches = matchService.getMatchByLeague(leagueId);
+        const matches = await matchService.getMatchByLeague(leagueId);
 
         if (!matches) {
             return res.status(404).send({

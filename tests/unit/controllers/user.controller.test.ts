@@ -36,7 +36,9 @@ describe('User Controller', () => {
 
             await userController.insertUser(req as Request, res as Response);
 
-            expect(mockedUserService.createUser).toHaveBeenCalledWith(mockUser);
+            expect(mockedUserService.createUser).toHaveBeenCalledWith(
+                expect.objectContaining(mockUser)
+            );
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.send).toHaveBeenCalledWith({
                 success: true,

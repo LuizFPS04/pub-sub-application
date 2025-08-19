@@ -1,98 +1,111 @@
+// IMPORTANTE: Mock DEVE vir antes de qualquer import
+const mockUserRepository = {
+    getAllUsers: jest.fn(),
+    getUserById: jest.fn(),
+    createUser: jest.fn(),
+    findUserByEmail: jest.fn(),
+    deleteUser: jest.fn(),
+    updateUser: jest.fn(),
+    findUserFollowedTeams: jest.fn(),
+    deleteAllUsers: jest.fn(),
+};
+
+// Mock do módulo UserRepository
+jest.mock('../../../src/repositories/user.repository', () => ({
+    UserRepository: jest.fn(() => mockUserRepository)
+}));
+
+// Agora importa o service (DEPOIS do mock)
 import * as userService from '../../../src/services/user.service';
-import { UserRepository } from '../../../src/repositories/user.repository';
 import { mockUser } from '../../mocks';
 import { Types } from 'mongoose';
 
-// Mock do repositório
-jest.mock('../../../src/repositories/user.repository');
-const MockedUserRepository = UserRepository as jest.MockedClass<typeof UserRepository>;
-
 describe('User Service', () => {
-    let userRepo: jest.Mocked<UserRepository>;
-
     beforeEach(() => {
         jest.clearAllMocks();
-        userRepo = new MockedUserRepository() as jest.Mocked<UserRepository>;
-        (UserRepository as any).mockImplementation(() => userRepo);
     });
 
     describe('getAllUsers', () => {
         it('should return all users', async () => {
             const expectedUsers = [mockUser];
-            userRepo.getAllUsers.mockResolvedValue(expectedUsers as any);
+            mockUserRepository.getAllUsers.mockResolvedValue(expectedUsers);
 
             const result = await userService.getAllUsers();
 
             expect(result).toEqual(expectedUsers);
-            expect(userRepo.getAllUsers).toHaveBeenCalledTimes(1);
+            expect(mockUserRepository.getAllUsers).toHaveBeenCalledTimes(1);
         });
     });
 
     describe('getUserById', () => {
         it('should return user by id', async () => {
             const userId = new Types.ObjectId();
-            userRepo.getUserById.mockResolvedValue(mockUser as any);
+            mockUserRepository.getUserById.mockResolvedValue(mockUser);
 
             const result = await userService.getUserById(userId);
 
             expect(result).toEqual(mockUser);
-            expect(userRepo.getUserById).toHaveBeenCalledWith(userId);
+            expect(mockUserRepository.getUserById).toHaveBeenCalledWith(userId);
         });
 
         it('should return null when user not found', async () => {
             const userId = new Types.ObjectId();
-            userRepo.getUserById.mockResolvedValue(null);
+            mockUserRepository.getUserById.mockResolvedValue(null);
 
             const result = await userService.getUserById(userId);
 
             expect(result).toBeNull();
-            expect(userRepo.getUserById).toHaveBeenCalledWith(userId);
+            expect(mockUserRepository.getUserById).toHaveBeenCalledWith(userId);
         });
     });
 
     describe('createUser', () => {
         it('should create a new user', async () => {
-            userRepo.createUser.mockResolvedValue(mockUser as any);
+            mockUserRepository.createUser.mockResolvedValue(mockUser);
 
             const result = await userService.createUser(mockUser as any);
 
             expect(result).toEqual(mockUser);
-            expect(userRepo.createUser).toHaveBeenCalledWith(mockUser);
+            expect(mockUserRepository.createUser).toHaveBeenCalledWith(mockUser);
         });
     });
 
     describe('findUserByEmail', () => {
         it('should find user by email', async () => {
             const email = 'joao@email.com';
-            userRepo.findUserByEmail.mockResolvedValue(mockUser as any);
+            mockUserRepository.findUserByEmail.mockResolvedValue(mockUser);
 
             const result = await userService.findUserByEmail(email);
 
             expect(result).toEqual(mockUser);
-            expect(userRepo.findUserByEmail).toHaveBeenCalledWith(email);
+            expect(mockUserRepository.findUserByEmail).toHaveBeenCalledWith(email);
         });
     });
 
     describe('deleteUser', () => {
         it('should delete user by email', async () => {
             const email = 'joao@email.com';
-            userRepo.findUserByEmail.mockResolvedValue(mockUser as any);
-            userRepo.deleteUser.mockResolvedValue(mockUser as any);
+            const mockUserWithId = { ...mockUser, _id: new Types.ObjectId() };
+            
+            // Mock para encontrar o usuário
+            mockUserRepository.findUserByEmail.mockResolvedValue(mockUserWithId);
+            // Mock para deletar o usuário
+            mockUserRepository.deleteUser.mockResolvedValue(mockUserWithId);
 
             const result = await userService.deleteUser(email);
 
-            expect(result).toEqual(mockUser);
-            expect(userRepo.findUserByEmail).toHaveBeenCalledWith(email);
-            expect(userRepo.deleteUser).toHaveBeenCalledWith(mockUser.email);
+            expect(result).toEqual(mockUserWithId);
+            expect(mockUserRepository.findUserByEmail).toHaveBeenCalledWith(email);
+            expect(mockUserRepository.deleteUser).toHaveBeenCalledWith(mockUserWithId._id);
         });
 
         it('should throw error when user not found', async () => {
             const email = 'notfound@email.com';
-            userRepo.findUserByEmail.mockResolvedValue(null);
+            mockUserRepository.findUserByEmail.mockResolvedValue(null);
 
             await expect(userService.deleteUser(email)).rejects.toThrow('User not found');
-            expect(userRepo.findUserByEmail).toHaveBeenCalledWith(email);
-            expect(userRepo.deleteUser).not.toHaveBeenCalled();
+            expect(mockUserRepository.findUserByEmail).toHaveBeenCalledWith(email);
+            expect(mockUserRepository.deleteUser).not.toHaveBeenCalled();
         });
     });
 
@@ -100,26 +113,29 @@ describe('User Service', () => {
         it('should update user by email', async () => {
             const email = 'joao@email.com';
             const updateData = { name: 'João Silva Updated' };
-            const updatedUser = { ...mockUser, ...updateData };
+            const mockUserWithId = { ...mockUser, _id: new Types.ObjectId() };
+            const updatedUser = { ...mockUserWithId, ...updateData };
 
-            userRepo.findUserByEmail.mockResolvedValue(mockUser as any);
-            userRepo.updateUser.mockResolvedValue(updatedUser as any);
+            // Mock para encontrar o usuário
+            mockUserRepository.findUserByEmail.mockResolvedValue(mockUserWithId);
+            // Mock para atualizar o usuário
+            mockUserRepository.updateUser.mockResolvedValue(updatedUser);
 
             const result = await userService.updateUser(email, updateData as any);
 
             expect(result).toEqual(updatedUser);
-            expect(userRepo.findUserByEmail).toHaveBeenCalledWith(email);
-            expect(userRepo.updateUser).toHaveBeenCalledWith(mockUser.email, updateData);
+            expect(mockUserRepository.findUserByEmail).toHaveBeenCalledWith(email);
+            expect(mockUserRepository.updateUser).toHaveBeenCalledWith(mockUserWithId._id, updateData);
         });
 
         it('should throw error when user not found for update', async () => {
             const email = 'notfound@email.com';
             const updateData = { name: 'Updated Name' };
-            userRepo.findUserByEmail.mockResolvedValue(null);
+            mockUserRepository.findUserByEmail.mockResolvedValue(null);
 
             await expect(userService.updateUser(email, updateData as any)).rejects.toThrow('User not found');
-            expect(userRepo.findUserByEmail).toHaveBeenCalledWith(email);
-            expect(userRepo.updateUser).not.toHaveBeenCalled();
+            expect(mockUserRepository.findUserByEmail).toHaveBeenCalledWith(email);
+            expect(mockUserRepository.updateUser).not.toHaveBeenCalled();
         });
     });
 });

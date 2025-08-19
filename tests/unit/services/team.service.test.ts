@@ -1,69 +1,85 @@
+const mockTeamRepository = {
+    getAllTeams: jest.fn(),
+    getTeamById: jest.fn(),
+    insertTeam: jest.fn(),
+    updateTeam: jest.fn(),
+    deleteTeam: jest.fn(),
+    upsertTeamStanding: jest.fn(),
+};
+
+const mockFootballApi = {
+    getStanding: jest.fn(),
+    getMatches: jest.fn(),
+};
+
+const mockAppEvents = {
+    emit: jest.fn(),
+    on: jest.fn(),
+    off: jest.fn(),
+};
+
+// Mock dos módulos
+jest.mock('../../../src/repositories/team.repository', () => ({
+    TeamRepository: jest.fn(() => mockTeamRepository)
+}));
+
+jest.mock('../../../src/integrations/footballApi', () => mockFootballApi);
+
+jest.mock('../../../src/events/eventEmitter', () => ({
+    appEvents: mockAppEvents
+}));
+
+// Agora importa o service (DEPOIS dos mocks)
 import * as teamService from '../../../src/services/team.service';
-import { TeamRepository } from '../../../src/repositories/team.repository';
-import * as footballApi from '../../../src/integrations/footballApi';
-import { appEvents } from '../../../src/events/eventEmitter';
 import { mockTeam } from '../../mocks';
 
-// Mocks
-jest.mock('../../../src/repositories/team.repository');
-jest.mock('../../../src/integrations/footballApi');
-jest.mock('../../../src/events/eventEmitter');
-
-const MockedTeamRepository = TeamRepository as jest.MockedClass<typeof TeamRepository>;
-const mockedFootballApi = footballApi as jest.Mocked<typeof footballApi>;
-const mockedAppEvents = appEvents as jest.Mocked<typeof appEvents>;
-
 describe('Team Service', () => {
-    let teamRepo: jest.Mocked<TeamRepository>;
-
     beforeEach(() => {
         jest.clearAllMocks();
-        teamRepo = new MockedTeamRepository() as jest.Mocked<TeamRepository>;
-        (TeamRepository as any).mockImplementation(() => teamRepo);
     });
 
     describe('getAllTeams', () => {
         it('should return all teams', async () => {
             const expectedTeams = [mockTeam];
-            teamRepo.getAllTeams.mockResolvedValue(expectedTeams as any);
+            mockTeamRepository.getAllTeams.mockResolvedValue(expectedTeams);
 
             const result = await teamService.getAllTeams();
 
             expect(result).toEqual(expectedTeams);
-            expect(teamRepo.getAllTeams).toHaveBeenCalledTimes(1);
+            expect(mockTeamRepository.getAllTeams).toHaveBeenCalledTimes(1);
         });
     });
 
     describe('getTeamById', () => {
         it('should return team by id', async () => {
             const teamId = '1';
-            teamRepo.getTeamById.mockResolvedValue(mockTeam as any);
+            mockTeamRepository.getTeamById.mockResolvedValue(mockTeam);
 
             const result = await teamService.getTeamById(teamId);
 
             expect(result).toEqual(mockTeam);
-            expect(teamRepo.getTeamById).toHaveBeenCalledWith(teamId);
+            expect(mockTeamRepository.getTeamById).toHaveBeenCalledWith(teamId);
         });
 
         it('should return null when team not found', async () => {
             const teamId = '999';
-            teamRepo.getTeamById.mockResolvedValue(null);
+            mockTeamRepository.getTeamById.mockResolvedValue(null);
 
             const result = await teamService.getTeamById(teamId);
 
             expect(result).toBeNull();
-            expect(teamRepo.getTeamById).toHaveBeenCalledWith(teamId);
+            expect(mockTeamRepository.getTeamById).toHaveBeenCalledWith(teamId);
         });
     });
 
     describe('insertTeam', () => {
         it('should create a new team', async () => {
-            teamRepo.insertTeam.mockResolvedValue(mockTeam as any);
+            mockTeamRepository.insertTeam.mockResolvedValue(mockTeam);
 
             const result = await teamService.insertTeam(mockTeam as any);
 
             expect(result).toEqual(mockTeam);
-            expect(teamRepo.insertTeam).toHaveBeenCalledWith(mockTeam);
+            expect(mockTeamRepository.insertTeam).toHaveBeenCalledWith(mockTeam);
         });
     });
 
@@ -73,24 +89,24 @@ describe('Team Service', () => {
             const updateData = { name: 'Updated Team Name' };
             const updatedTeam = { ...mockTeam, ...updateData };
 
-            teamRepo.updateTeam.mockResolvedValue(updatedTeam as any);
+            mockTeamRepository.updateTeam.mockResolvedValue(updatedTeam);
 
             const result = await teamService.updateTeam(teamId, updateData as any);
 
             expect(result).toEqual(updatedTeam);
-            expect(teamRepo.updateTeam).toHaveBeenCalledWith(teamId, updateData);
+            expect(mockTeamRepository.updateTeam).toHaveBeenCalledWith(teamId, updateData);
         });
     });
 
     describe('deleteTeam', () => {
         it('should delete a team', async () => {
             const teamId = '1';
-            teamRepo.deleteTeam.mockResolvedValue(mockTeam as any);
+            mockTeamRepository.deleteTeam.mockResolvedValue(mockTeam);
 
             const result = await teamService.deleteTeam(teamId);
 
             expect(result).toEqual(mockTeam);
-            expect(teamRepo.deleteTeam).toHaveBeenCalledWith(teamId);
+            expect(mockTeamRepository.deleteTeam).toHaveBeenCalledWith(teamId);
         });
     });
 
@@ -109,14 +125,14 @@ describe('Team Service', () => {
                 }]
             };
 
-            mockedFootballApi.getStanding.mockResolvedValue(apiResponse);
-            teamRepo.upsertTeamStanding.mockResolvedValue({ modifiedCount: 1 } as any);
+            mockFootballApi.getStanding.mockResolvedValue(apiResponse);
+            mockTeamRepository.upsertTeamStanding.mockResolvedValue({ modifiedCount: 1 });
 
             const result = await teamService.syncTeams();
 
-            expect(mockedFootballApi.getStanding).toHaveBeenCalledTimes(1);
-            expect(teamRepo.upsertTeamStanding).toHaveBeenCalledTimes(1);
-            expect(mockedAppEvents.emit).toHaveBeenCalledWith('updateTable', apiResponse.standings[0].table[0]);
+            expect(mockFootballApi.getStanding).toHaveBeenCalledTimes(1);
+            expect(mockTeamRepository.upsertTeamStanding).toHaveBeenCalledTimes(1);
+            expect(mockAppEvents.emit).toHaveBeenCalledWith('updateTable', apiResponse.standings[0].table[0]);
             expect(result).toEqual(apiResponse);
         });
 
@@ -133,12 +149,12 @@ describe('Team Service', () => {
                 }]
             };
 
-            mockedFootballApi.getStanding.mockResolvedValue(apiResponse);
-            teamRepo.upsertTeamStanding.mockResolvedValue({ modifiedCount: 0 } as any);
+            mockFootballApi.getStanding.mockResolvedValue(apiResponse);
+            mockTeamRepository.upsertTeamStanding.mockResolvedValue({ modifiedCount: 0 });
 
             await teamService.syncTeams();
 
-            expect(mockedAppEvents.emit).not.toHaveBeenCalled();
+            expect(mockAppEvents.emit).not.toHaveBeenCalled();
         });
     });
 });

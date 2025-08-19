@@ -57,7 +57,7 @@ describe('User Integration Tests', () => {
         });
     });
 
-    describe('GET /api/v1/user/all', () => {
+    describe('GET /api/v1/users', () => {
         it('should return all users', async () => {
             // Cria alguns usuários de teste
             const users = [
@@ -68,7 +68,7 @@ describe('User Integration Tests', () => {
             await UserModel.create(users);
 
             const response = await request(app)
-                .get('/api/v1/user/all')
+                .get('/api/v1/users')
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -81,7 +81,7 @@ describe('User Integration Tests', () => {
 
         it('should return empty array when no users exist', async () => {
             const response = await request(app)
-                .get('/api/v1/user/all')
+                .get('/api/v1/users')
                 .expect(200);
 
             expect(response.body.success).toBe(true);

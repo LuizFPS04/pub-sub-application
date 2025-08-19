@@ -5,8 +5,7 @@ export const mockUser = {
     name: 'João Silva',
     email: 'joao@email.com',
     password: 'senha123',
-    followedTeams: [new Types.ObjectId()],
-    isActive: true
+    followedTeams: [new Types.ObjectId()]
 };
 
 // Mock de time

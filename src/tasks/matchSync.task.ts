@@ -6,7 +6,7 @@ export async function matchTask() {
     "* * * * *",
     async () => {
       try {
-        console.log("🔄 Sincronizando jogos do Brasileirão...");
+        console.log("🔄 Sincronizando jogos do Brasileirão... ", new Date().toISOString());
         await matchService.syncMatches();
         console.log("✅ Sincronização concluída!");
       } catch (err) {

@@ -18,8 +18,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api", routes);
 
 async function startApp() {
-    await connectToDatabase(); // garante conexão antes das tasks
-    await runTasks();          // só roda tasks após conexão
+    await connectToDatabase();
+    await runTasks();
 }
 
 startApp();
